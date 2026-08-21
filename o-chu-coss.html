@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ô chữ bí mật - COSS</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px 12px 60px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0d1b3e;
+    color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    font-size: 20px;
+    text-align: center;
+    margin: 0 0 4px;
+    color: #ffd966;
+  }
+  p.sub {
+    text-align: center;
+    font-size: 13px;
+    color: #cfd6e8;
+    margin: 0 0 20px;
+    max-width: 320px;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(9, 34px);
+    grid-template-rows: repeat(6, 34px);
+    gap: 2px;
+    margin-bottom: 20px;
+  }
+  .cell {
+    position: relative;
+    width: 34px;
+    height: 34px;
+  }
+  .cell.active {
+    background: #fffdf5;
+    border-radius: 3px;
+  }
+  .cell .num {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    font-size: 8px;
+    color: #999;
+  }
+  .cell input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #0d1b3e;
+    padding: 0;
+    border-radius: 3px;
+  }
+  .cell input:focus {
+    outline: 2px solid #ffd966;
+  }
+  .cell input.correct { color: #2e7d32; }
+  .cell input.wrong { color: #c62828; }
+  #btnRow {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  button {
+    background: #ffd966;
+    color: #0d1b3e;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: transparent;
+    color: #f5f5f5;
+    border: 1px solid #556;
+  }
+  #feedback {
+    min-height: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  #feedback.ok { color: #81c784; }
+  #feedback.bad { color: #ef9a9a; }
+  .clues {
+    width: 100%;
+    max-width: 360px;
+  }
+  .clues h2 {
+    font-size: 15px;
+    color: #ffd966;
+    margin: 16px 0 8px;
+  }
+  .clues p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #dde3f0;
+    margin: 0 0 8px;
+  }
+  .gift-section {
+    width: 100%;
+    max-width: 360px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #2a3a63;
+  }
+  .gift-section h2 {
+    font-size: 15px;
+    color: #ffd966;
+    margin: 0 0 4px;
+  }
+  .gift-section p.note {
+    font-size: 12px;
+    color: #9aa4c0;
+    margin: 0 0 14px;
+  }
+  .gift-card {
+    background: #14224a;
+    border: 1px solid #2a3a63;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .gift-card .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #0d1b3e;
+    background: #ffd966;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+  .gift-card .tag.reuse { background: #a5d6a7; }
+  .gift-card h3 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    color: #f5f5f5;
+  }
+  .gift-card p {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #cfd6e8;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<h1>Ô chữ bí mật - COSS</h1>
+<p class="sub">Trả lời 7 từ khóa để hiểu thêm về CLB COSS và dự án Nguyệt Sắc Trao Nhân nhé!</p>
+
+<div id="grid"></div>
+
+<div id="btnRow">
+  <button id="checkBtn">Kiểm tra</button>
+  <button id="resetBtn" class="secondary">Làm lại</button>
+</div>
+<p id="feedback"></p>
+
+<div class="clues">
+  <h2>Hàng ngang</h2>
+  <p>1. CLB của mình thường được gọi tắt bằng 4 chữ cái nào? (4 chữ)</p>
+  <p>3. Vào đêm rằm tháng 8 âm lịch, thứ gì trên bầu trời tròn và sáng nhất trong năm? (5 chữ)</p>
+  <p>5. Điều ngược lại với hành động "nhận" gọi là gì? (4 chữ)</p>
+  <p>7. Từ Hán Việt nào dùng để chỉ ánh trăng, cũng là chữ mở đầu tên dự án Trung Thu năm nay? (6 chữ)</p>
+
+  <h2>Hàng dọc</h2>
+  <p>2. Cầu vồng được tạo nên từ nhiều gì hợp lại? (3 chữ)</p>
+  <p>4. Trong tiếng Hán Việt, từ nào mang nghĩa là "con người"? (4 chữ)</p>
+  <p>6. Số tiền được để dành riêng cho một mục đích cụ thể, ví dụ để tổ chức một chương trình, được gọi là gì? (3 chữ)</p>
+</div>
+
+<div class="gift-section">
+  <h2>🎁 Quà tặng khi hoàn thành</h2>
+  <p class="note">Note nội bộ cho lead lọc — chưa chốt, chỉ là các lựa chọn đề xuất.</p>
+
+  <div class="gift-card">
+    <span class="tag reuse">Giữ lại từ năm trước</span>
+    <h3>Móc khóa mini in logo COSS</h3>
+    <p>Quà quen thuộc, dễ nhận diện thương hiệu CLB. Cần đặt in trước, chi phí tùy số lượng và chất liệu (mica/gỗ).</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag reuse">Giữ lại từ năm trước</span>
+    <h3>Bánh/kẹo Trung Thu tự làm</h3>
+    <p>Bánh dẻo mini, kẹo dừa, hoặc thạch tự nấu. Hợp không khí Trung Thu, chi phí thấp nếu tự làm số lượng lớn, nhưng cần chuẩn bị sớm và có nơi bảo quản.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới</span>
+    <h3>Lồng đèn giấy mini tự gấp</h3>
+    <p>Gấp từ giấy màu, gắn que tre nhỏ. Chi phí rẻ, có thể nhờ thành viên CLB gấp sẵn trước club fair, gắn liền hình ảnh Trung Thu.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới</span>
+    <h3>Voucher giảm giá 10-15% tại booth đồ ăn COSS</h3>
+    <p>Không tốn chi phí sản xuất, vừa là quà vừa kéo người chơi quay lại mua đồ ăn ở booth, hỗ trợ mục tiêu gây quỹ.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới</span>
+    <h3>Sticker theo bộ nhận diện COSS / Nguyệt Sắc Trao Nhân</h3>
+    <p>In số lượng lớn với giá rẻ, gọn nhẹ để phát nhanh, đồng thời giúp quảng bá hình ảnh CLB khi SV dán lên đồ dùng.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới</span>
+    <h3>Postcard lời chúc Trung Thu viết tay</h3>
+    <p>Thành viên CLB viết sẵn vài mẫu lời chúc ngắn, chi phí gần như bằng 0, tạo cảm giác ấm áp cá nhân hóa cho người chơi.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới - chi phí thấp</span>
+    <h3>Thiệp gấp hình mặt trăng/thỏ ngọc kèm lời chúc</h3>
+    <p>Chỉ cần giấy màu và bút, gấp hình trăng khuyết hoặc thỏ ngọc đơn giản, bên trong viết 1 câu chúc hoặc thông điệp thiện nguyện ngắn. Gần như 0 đồng nếu tận dụng giấy dư từ trang trí booth.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới - chi phí thấp</span>
+    <h3>Bao lì xì mini "Gửi yêu thương"</h3>
+    <p>Bao lì xì nhỏ (mua sỉ rất rẻ) đựng 1 mẩu giấy ghi lời chúc hoặc 1 câu quote về sẻ chia, rút ngẫu nhiên như "thẻ may mắn". Vừa rẻ vừa tạo cảm giác bất ngờ khi mở ra.</p>
+  </div>
+
+  <div class="gift-card">
+    <span class="tag">Mới - chi phí thấp</span>
+    <h3>Vòng chỉ handmade "Trao yêu thương"</h3>
+    <p>Dây chỉ thêu nhiều màu tết thành vòng tay đơn giản, gắn liền với từ khóa "Trao" trong tên dự án. Chi phí chỉ vài nghìn/vòng nếu mua chỉ thêu theo cuộn lớn, thành viên CLB có thể tự làm trước.</p>
+  </div>
+</div>
+
+<script>
+var layout = [
+["C1","O","S2","S",null,null,null,null,null],
+["T3","R","A","N4","G",null,null,null,null],
+[null,null,"C","H",null,null,null,null,null],
+[null,"T5","R","A","O","Q6",null,null,null],
+[null,null,null,"N7","G","U","Y","E","T"],
+[null,null,null,null,null,"Y",null,null,null]
+];
+var grid = document.getElementById("grid");
+var inputs = {};
+for (var r=0;r<6;r++){
+  for (var c=0;c<9;c++){
+    var cellVal = layout[r][c];
+    var wrap = document.createElement("div");
+    wrap.className = "cell";
+    if (cellVal===null){
+      grid.appendChild(wrap);
+      continue;
+    }
+    wrap.classList.add("active");
+    var letter = cellVal.replace(/[0-9]/g,"");
+    var num = cellVal.match(/[0-9]+/);
+    if (num){
+      var lbl = document.createElement("span");
+      lbl.className = "num";
+      lbl.textContent = num[0];
+      wrap.appendChild(lbl);
+    }
+    var inp = document.createElement("input");
+    inp.type = "text";
+    inp.maxLength = 1;
+    inp.setAttribute("data-r", r);
+    inp.setAttribute("data-c", c);
+    inp.setAttribute("data-ans", letter);
+    inp.addEventListener("input", function(e){
+      e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g,"");
+      e.target.classList.remove("correct","wrong");
+      if (e.target.value){
+        var nr = parseInt(e.target.getAttribute("data-r"));
+        var nc = parseInt(e.target.getAttribute("data-c"))+1;
+        var next = inputs[nr+"_"+nc];
+        if (next) next.focus();
+      }
+    });
+    inputs[r+"_"+c] = inp;
+    wrap.appendChild(inp);
+    grid.appendChild(wrap);
+  }
+}
+document.getElementById("checkBtn").addEventListener("click", function(){
+  var total = 0, correct = 0, allFilled = true;
+  Object.keys(inputs).forEach(function(k){
+    var inp = inputs[k];
+    total++;
+    if (!inp.value){ allFilled = false; }
+    inp.classList.remove("correct","wrong");
+    if (inp.value === inp.getAttribute("data-ans")){
+      correct++;
+      inp.classList.add("correct");
+    } else if (inp.value) {
+      inp.classList.add("wrong");
+    }
+  });
+  var fb = document.getElementById("feedback");
+  fb.classList.remove("ok","bad");
+  if (!allFilled){
+    fb.textContent = "Điền hết các ô rồi kiểm tra nhé (" + correct + "/" + total + " đúng cho tới giờ)";
+    fb.classList.add("bad");
+  } else if (correct === total){
+    fb.textContent = "Chính xác hết! Bạn hiểu COSS quá rõ luôn.";
+    fb.classList.add("ok");
+  } else {
+    fb.textContent = "Đúng " + correct + "/" + total + " ô. Thử lại các ô đỏ nhé.";
+    fb.classList.add("bad");
+  }
+});
+document.getElementById("resetBtn").addEventListener("click", function(){
+  Object.keys(inputs).forEach(function(k){
+    var inp = inputs[k];
+    inp.value = "";
+    inp.classList.remove("correct","wrong");
+  });
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("feedback").className = "";
+});
+</script>
+</body>
+</html>
