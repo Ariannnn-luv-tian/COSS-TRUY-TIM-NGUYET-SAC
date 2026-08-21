@@ -44,7 +44,6 @@
             overflow-x: auto;
         }
 
-        /* Khung 9 cột x 6 hàng chứa đầy đủ ô đen nối liền chuẩn 100% theo ảnh mẫu */
         .crossword-grid {
             display: grid;
             grid-template-columns: repeat(9, 36px);
@@ -62,12 +61,8 @@
             position: relative;
         }
 
-        /* Ẩn các ô trống không nằm trong câu hỏi */
-        .cell.inactive {
-            visibility: hidden;
-        }
+        .cell.inactive { visibility: hidden; }
 
-        /* Ô đen active chứa chữ */
         .cell.active { 
             background-color: #0d0d0d; 
             border: 1px solid #333;
@@ -133,9 +128,14 @@
             border-radius: 4px;
             cursor: pointer;
             user-select: none;
+            transition: background-color 0.2s, border-color 0.2s;
         }
 
-        .search-cell.selected { background-color: #00bcd4; color: #000; }
+        .search-cell.selected { 
+            background-color: #00bcd4; 
+            color: #000;
+            border-color: #00e5ff;
+        }
 
         .clues { font-size: 13px; line-height: 1.5; margin-top: 15px; }
         .clues h4 { margin: 10px 0 4px 0; color: #00bcd4; }
@@ -210,24 +210,19 @@
     <!-- PART 2 -->
     <div id="part2" class="hidden">
         <h2>Part 2: Mật mã nguyệt sắc (5 - 7 phút)</h2>
+        
         <div class="hint-box">
-            <i>"Không phải tất cả những gì bạn tìm được ở vòng 1 đều là đáp án. Có những thứ là chìa khóa."</i><br><br>
-            🌙 <b>Gợi ý:</b> Hãy nhìn lại những từ đã xuất hiện trong đêm trăng. Lấy chữ cái đầu của những điều thuộc về COSS.<br>
-            <b>COSS – SẮC – TRĂNG – TRAO – NGUYỆT – NHÂN – QUỸ</b><br>
-            → lấy chữ cái đầu: <b>C - S - T - T - N - N - Q</b>
+            🌙 <b>Hướng dẫn:</b> Nhấp chọn trực tiếp các ô chữ trong bảng 7x7 bên dưới theo đúng thứ tự chìa khóa mật mã để giải phong ấn.
         </div>
 
+        <!-- BẢNG CHỌN 7x7 -->
         <div class="search-grid" id="searchGrid"></div>
-
-        <div style="text-align: center; margin-top: 15px;">
-            <input type="text" id="secretKey" placeholder="Nhập Key giải mật mã (CSTTNNQ)" style="width: 85%; padding: 10px; font-size: 15px; text-transform: uppercase; border-radius: 4px; border: 1px solid #555; background: #000; color: #fff; text-align: center;">
-        </div>
 
         <button onclick="checkPart2()">Mở Khóa Mật Mã Part 2</button>
         <div id="msg2" class="msg"></div>
 
         <div class="rules">
-            ⚠️ <b>Lưu ý:</b> Không cho chơi lại ngay nếu sai, hoặc chỉ được xin 1 hint nhưng bị trừ điểm.
+            ⚠️ <b>Lưu ý:</b> Người chơi bấm chọn ô trên bảng để ghép chuỗi ký tự mật mã. Nhấp lại vào ô đã chọn nếu muốn bỏ chọn.
         </div>
 
         <div id="reward" class="reward-box hidden">
@@ -242,17 +237,6 @@
 </div>
 
 <script>
-    /*
-      SƠ ĐỒ TỌA ĐỘ CHÍNH XÁC TỪNG Ô DỌC/NGANG THEO ẢNH MẪU:
-      1 Ngang (COSS)  : (0,0)->C, (0,1)->O, (0,2)->S, (0,3)->S
-      2 Dọc   (SAC)   : (0,2)->S, (1,2)->A, (2,2)->C
-      3 Ngang (TRANG) : (1,0)->T, (1,1)->R, (1,2)->A, (1,3)->N, (1,4)->G
-      4 Dọc   (NHAN)  : (1,3)->N, (2,3)->H, (3,3)->A, (4,3)->N
-      5 Ngang (TRAO)  : (3,1)->T, (3,2)->R, (3,3)->A, (3,4)->O
-      6 Dọc   (QUY)   : (3,5)->Q, (4,5)->U, (5,5)->Y
-      7 Ngang (NGUYET): (4,3)->N, (4,4)->G, (4,5)->U, (4,6)->Y, (4,7)->E, (4,8)->T
-    */
-
     const words = [
         { num: 1, ans: "COSS",   r: 0, c: 0, dir: "H" },
         { num: 2, ans: "SAC",    r: 0, c: 2, dir: "V" },
@@ -340,7 +324,7 @@
         }
     }
 
-    // Part 2 Matrix
+    // Ma trận 7x7 Part 2
     const searchMatrix = [
         ['S', 'U', 'H', 'I', 'E', 'Y', 'R'],
         ['I', 'F', 'O', 'T', 'N', 'G', 'T'],
@@ -351,31 +335,49 @@
         ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
     ];
 
+    let selectedLettersSequence = [];
+
     function initPart2Grid() {
         const grid = document.getElementById("searchGrid");
         grid.innerHTML = "";
+        selectedLettersSequence = [];
+        
         for (let r = 0; r < 7; r++) {
             for (let c = 0; c < 7; c++) {
                 const cell = document.createElement("div");
                 cell.className = "search-cell";
                 cell.innerText = searchMatrix[r][c];
-                cell.onclick = () => cell.classList.toggle("selected");
+                cell.dataset.r = r;
+                cell.dataset.c = c;
+                
+                // Chọn / Bỏ chọn ô chữ trực tiếp trên bảng
+                cell.onclick = () => {
+                    if (cell.classList.contains("selected")) {
+                        cell.classList.remove("selected");
+                        const idx = selectedLettersSequence.findIndex(item => item.r === r && item.c === c);
+                        if (idx !== -1) selectedLettersSequence.splice(idx, 1);
+                    } else {
+                        cell.classList.add("selected");
+                        selectedLettersSequence.push({ r: r, c: c, letter: searchMatrix[r][c] });
+                    }
+                };
                 grid.appendChild(cell);
             }
         }
     }
 
     function checkPart2() {
-        const keyInput = document.getElementById("secretKey").value.replace(/[^a-zA-Z]/g, "").toUpperCase();
         const msg = document.getElementById("msg2");
+        const selectedString = selectedLettersSequence.map(item => item.letter).join("");
 
-        if (keyInput === "CSTTNNQ") {
+        // Kiểm tra xem chuỗi ký tự ghép từ các ô chọn có đúng mật mã không
+        if (selectedString === "CSTTNNQ" || selectedString === "CSTTNQ") {
             msg.className = "msg success";
-            msg.innerText = "Mật mã chính xác! Bạn đã hoàn thành trò chơi.";
+            msg.innerText = "Mật mã chính xác! Bạn đã giải phong ấn thành công Part 2.";
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Key giải mật mã chưa đúng. Hãy thử lại!";
+            msg.innerText = "Thứ tự các ô chữ đã chọn chưa chính xác. Vui lòng bấm chọn lại!";
         }
     }
 </script>
