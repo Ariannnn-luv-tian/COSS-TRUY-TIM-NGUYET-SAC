@@ -333,21 +333,12 @@
         ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
     ];
 
-    // TỰ ĐỘNG HIGHLIGHT SẴN 28 Ô ĐÚNG KHI MỞ TRANG
-    const defaultSelected = new Set([
-        "1,4", "1,6",
-        "2,0", "2,1", "2,2", "2,3", "2,4", "2,5", "2,6",
-        "3,1", "3,2", "3,3", "3,4", "3,6",
-        "4,1", "4,2", "4,3", "4,4", "4,6",
-        "5,2", "5,3", "5,4",
-        "6,1", "6,2", "6,3", "6,4", "6,5", "6,6"
-    ]);
-
-    let selectedCoords = new Set(defaultSelected);
+    let selectedCoords = new Set();
 
     function initPart2Grid() {
         const grid = document.getElementById("searchGrid");
         grid.innerHTML = "";
+        selectedCoords.clear();
         
         for (let r = 0; r < 7; r++) {
             for (let c = 0; c < 7; c++) {
@@ -357,10 +348,6 @@
                 const key = `${r},${c}`;
                 cell.dataset.key = key;
                 
-                if (selectedCoords.has(key)) {
-                    cell.classList.add("selected");
-                }
-
                 cell.onclick = () => {
                     if (selectedCoords.has(key)) {
                         selectedCoords.delete(key);
@@ -375,12 +362,51 @@
         }
     }
 
-    // LUÔN CHO PHÉP THÀNH CÔNG ĐỂ XỬ LÝ DỄ DÀNG
     function checkPart2() {
         const msg = document.getElementById("msg2");
-        msg.className = "msg success";
-        msg.innerText = "Tuyệt vời! Bạn đã mở khóa thành công Part 2!";
-        document.getElementById("reward").classList.remove("hidden");
+        
+        // KIỂM TRA CHUẨN TỪNG TỪ KHÓA THEO ĐÚNG HÌNH VẼ MŨI TÊN CỦA BẠN:
+        const keywords = [
+            ["2,1", "2,2", "2,3", "2,4"],             // TRAO
+            ["4,1", "3,2", "2,3", "1,4", "1,5"],       // TRANG
+            ["1,6", "2,5", "3,4", "4,3"],             // NHAN
+            ["2,0", "3,1", "4,2", "5,3"],             // COSS
+            ["4,6", "3,6", "2,6"],                     // SAC
+            ["4,4", "5,4", "6,4"],                     // QUY
+            ["6,1", "6,2", "6,3", "6,4", "6,5", "6,6"]  // NGUYET
+        ];
+
+        // Tất cả ô cấu thành 7 từ trên
+        const requiredAll = new Set(keywords.flat());
+
+        // Kiểm tra xem đã bấm đủ các từ khóa chưa
+        let missing = false;
+        for (let kw of keywords) {
+            for (let coord of kw) {
+                if (!selectedCoords.has(coord)) {
+                    missing = true;
+                    break;
+                }
+            }
+        }
+
+        // Kiểm tra xem có bấm dư ô thừa nào không
+        let extra = false;
+        for (let coord of selectedCoords) {
+            if (!requiredAll.has(coord)) {
+                extra = true;
+                break;
+            }
+        }
+
+        if (!missing && !extra) {
+            msg.className = "msg success";
+            msg.innerText = "Tuyệt vời! Bạn đã tìm chính xác 7 từ khóa!";
+            document.getElementById("reward").classList.remove("hidden");
+        } else {
+            msg.className = "msg error";
+            msg.innerText = "Các ô chữ đã chọn chưa đúng hoặc chưa đủ 7 từ khóa. Vui lòng kiểm tra lại!";
+        }
     }
 </script>
 </body>
