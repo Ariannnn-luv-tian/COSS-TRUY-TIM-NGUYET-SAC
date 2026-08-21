@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truy Tìm Nguyệt Sắc - COSS</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --accent-yellow: #ffeb3b;
+            --accent-green: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 540px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        h2 { text-align: center; color: var(--accent-yellow); margin-top: 0; font-size: 20px; }
+        .hidden { display: none !important; }
+
+        .crossword-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        /* Khung 9 cột x 6 hàng chứa đầy đủ ô đen nối liền chuẩn 100% theo ảnh mẫu */
+        .crossword-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 36px);
+            grid-template-rows: repeat(6, 36px);
+            gap: 4px;
+        }
+
+        .cell {
+            width: 36px;
+            height: 36px;
+            background-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Ẩn các ô trống không nằm trong câu hỏi */
+        .cell.inactive {
+            visibility: hidden;
+        }
+
+        /* Ô đen active chứa chữ */
+        .cell.active { 
+            background-color: #0d0d0d; 
+            border: 1px solid #333;
+            border-radius: 6px;
+        }
+
+        .cell.correct { 
+            background-color: #113818; 
+            border: 1px solid var(--accent-green); 
+        }
+
+        .cell.correct input { color: #5cdb5c; }
+        
+        .cell input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            text-align: center;
+            color: #28a745;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .cell .num-container {
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            display: flex;
+            gap: 2px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .cell .num {
+            font-size: 10px;
+            color: #aaaaaa;
+            font-weight: bold;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 38px);
+            grid-template-rows: repeat(7, 38px);
+            gap: 4px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .search-cell {
+            width: 38px;
+            height: 38px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .search-cell.selected { background-color: #00bcd4; color: #000; }
+
+        .clues { font-size: 13px; line-height: 1.5; margin-top: 15px; }
+        .clues h4 { margin: 10px 0 4px 0; color: #00bcd4; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover { background-color: #1e88e5; }
+
+        .hint-box {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+            line-height: 1.4;
+            border-left: 4px solid var(--accent-yellow);
+        }
+
+        .msg { font-weight: bold; text-align: center; margin-top: 10px; font-size: 14px; }
+        .msg.error { color: #ff5252; }
+        .msg.success { color: #4caf50; }
+
+        .rules { font-size: 12px; color: #ff8a80; margin-top: 10px; font-style: italic; }
+
+        .reward-box {
+            background: #253b29;
+            border: 1px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- PART 1 -->
+    <div id="part1">
+        <h2>Part 1: Ô Chữ Bí Mật</h2>
+        <div class="crossword-container">
+            <div class="crossword-grid" id="crosswordGrid"></div>
+        </div>
+        <button onclick="checkPart1()">Kiểm Tra Đáp Án Part 1</button>
+        <div id="msg1" class="msg"></div>
+
+        <div class="clues">
+            <h4>Hàng ngang</h4>
+            <b>1.</b> CLB của mình thường được gọi tắt bằng 4 chữ cái nào? (4 chữ)<br>
+            <b>3.</b> Vào đêm rằm tháng 8 âm lịch, thứ gì trên bầu trời tròn và sáng nhất trong năm? (5 chữ)<br>
+            <b>5.</b> Điều ngược lại với hành động "nhận" gọi là gì? (4 chữ)<br>
+            <b>7.</b> Từ Hán Việt nào dùng để chỉ ánh trăng, cũng là chữ mở đầu tên dự án Trung Thu năm nay? (6 chữ)
+
+            <h4>Hàng dọc</h4>
+            <b>2.</b> Cầu vồng được tạo nên từ nhiều gì hợp lại? (3 chữ)<br>
+            <b>4.</b> Trong tiếng Hán Việt, từ nào mang nghĩa là "con người"? (4 chữ)<br>
+            <b>6.</b> Số tiền được để dành riêng cho một mục đích cụ thể, ví dụ để tổ chức một chương trình, được gọi là gì? (3 chữ)
+        </div>
+    </div>
+
+    <!-- PART 2 -->
+    <div id="part2" class="hidden">
+        <h2>Part 2: Mật mã nguyệt sắc (5 - 7 phút)</h2>
+        <div class="hint-box">
+            <i>"Không phải tất cả những gì bạn tìm được ở vòng 1 đều là đáp án. Có những thứ là chìa khóa."</i><br><br>
+            🌙 <b>Gợi ý:</b> Hãy nhìn lại những từ đã xuất hiện trong đêm trăng. Lấy chữ cái đầu của những điều thuộc về COSS.<br>
+            <b>COSS – SẮC – TRĂNG – TRAO – NGUYỆT – NHÂN – QUỸ</b><br>
+            → lấy chữ cái đầu: <b>C - S - T - T - N - N - Q</b>
+        </div>
+
+        <div class="search-grid" id="searchGrid"></div>
+
+        <div style="text-align: center; margin-top: 15px;">
+            <input type="text" id="secretKey" placeholder="Nhập Key giải mật mã (CSTTNNQ)" style="width: 85%; padding: 10px; font-size: 15px; text-transform: uppercase; border-radius: 4px; border: 1px solid #555; background: #000; color: #fff; text-align: center;">
+        </div>
+
+        <button onclick="checkPart2()">Mở Khóa Mật Mã Part 2</button>
+        <div id="msg2" class="msg"></div>
+
+        <div class="rules">
+            ⚠️ <b>Lưu ý:</b> Không cho chơi lại ngay nếu sai, hoặc chỉ được xin 1 hint nhưng bị trừ điểm.
+        </div>
+
+        <div id="reward" class="reward-box hidden">
+            🎉 <b>HOÀN THÀNH CẢ 2 VÒNG!</b><br><br>
+            🌙 <b>HOÀN THÀNH VÒNG 1:</b> Nhận 1 mảnh Nguyệt Sắc<br>
+            🌕 <b>HOÀN THÀNH VÒNG 2:</b> Nhận mảnh cuối cùng<br><br>
+            ✨ <b>GHÉP 2 MẢNH:</b> Tạo thành logo/thông điệp COSS → Đổi quà đặc biệt:<br>
+            • Móc khóa len<br>
+            • Lồng đèn trung thu mini
+        </div>
+    </div>
+</div>
+
+<script>
+    /*
+      SƠ ĐỒ TỌA ĐỘ CHÍNH XÁC TỪNG Ô DỌC/NGANG THEO ẢNH MẪU:
+      1 Ngang (COSS)  : (0,0)->C, (0,1)->O, (0,2)->S, (0,3)->S
+      2 Dọc   (SAC)   : (0,2)->S, (1,2)->A, (2,2)->C
+      3 Ngang (TRANG) : (1,0)->T, (1,1)->R, (1,2)->A, (1,3)->N, (1,4)->G
+      4 Dọc   (NHAN)  : (1,3)->N, (2,3)->H, (3,3)->A, (4,3)->N
+      5 Ngang (TRAO)  : (3,1)->T, (3,2)->R, (3,3)->A, (3,4)->O
+      6 Dọc   (QUY)   : (3,5)->Q, (4,5)->U, (5,5)->Y
+      7 Ngang (NGUYET): (4,3)->N, (4,4)->G, (4,5)->U, (4,6)->Y, (4,7)->E, (4,8)->T
+    */
+
+    const words = [
+        { num: 1, ans: "COSS",   r: 0, c: 0, dir: "H" },
+        { num: 2, ans: "SAC",    r: 0, c: 2, dir: "V" },
+        { num: 3, ans: "TRANG",  r: 1, c: 0, dir: "H" },
+        { num: 4, ans: "NHAN",   r: 1, c: 3, dir: "V" },
+        { num: 5, ans: "TRAO",   r: 3, c: 1, dir: "H" },
+        { num: 6, ans: "QUY",    r: 3, c: 5, dir: "V" },
+        { num: 7, ans: "NGUYET", r: 4, c: 3, dir: "H" }
+    ];
+
+    const cwGrid = document.getElementById("crosswordGrid");
+    const matrix = Array(6).fill(null).map(() => Array(9).fill(null));
+
+    words.forEach(w => {
+        for (let i = 0; i < w.ans.length; i++) {
+            let r = w.dir === "H" ? w.r : w.r + i;
+            let c = w.dir === "H" ? w.c + i : w.c;
+            if (!matrix[r][c]) {
+                matrix[r][c] = { letter: w.ans[i], nums: [] };
+            }
+            if (i === 0) {
+                matrix[r][c].nums.push(w.num);
+            }
+        }
+    });
+
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 9; c++) {
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            if (matrix[r][c]) {
+                cell.classList.add("active");
+                
+                if (matrix[r][c].nums.length > 0) {
+                    const numContainer = document.createElement("div");
+                    numContainer.className = "num-container";
+                    matrix[r][c].nums.forEach(n => {
+                        const numSpan = document.createElement("span");
+                        numSpan.className = "num";
+                        numSpan.innerText = n;
+                        numContainer.appendChild(numSpan);
+                    });
+                    cell.appendChild(numContainer);
+                }
+
+                const input = document.createElement("input");
+                input.maxLength = 1;
+                input.dataset.r = r;
+                input.dataset.c = c;
+                cell.appendChild(input);
+            } else {
+                cell.classList.add("inactive");
+            }
+            cwGrid.appendChild(cell);
+        }
+    }
+
+    function checkPart1() {
+        let isCorrect = true;
+        const inputs = cwGrid.querySelectorAll("input");
+
+        inputs.forEach(input => {
+            let r = input.dataset.r;
+            let c = input.dataset.c;
+            if (input.value.toUpperCase() === matrix[r][c].letter) {
+                input.parentElement.classList.add("correct");
+            } else {
+                input.parentElement.classList.remove("correct");
+                isCorrect = false;
+            }
+        });
+
+        const msg = document.getElementById("msg1");
+        if (isCorrect) {
+            msg.className = "msg success";
+            msg.innerText = "Chính xác! Đang chuyển sang Part 2...";
+            setTimeout(() => {
+                document.getElementById("part1").classList.add("hidden");
+                document.getElementById("part2").classList.remove("hidden");
+                initPart2Grid();
+            }, 1200);
+        } else {
+            msg.className = "msg error";
+            msg.innerText = "Có ô chưa chính xác, bạn hãy kiểm tra lại nhé!";
+        }
+    }
+
+    // Part 2 Matrix
+    const searchMatrix = [
+        ['S', 'U', 'H', 'I', 'E', 'Y', 'R'],
+        ['I', 'F', 'O', 'T', 'N', 'G', 'T'],
+        ['C', 'T', 'R', 'A', 'O', 'R', 'C'],
+        ['J', 'O', 'H', 'O', 'A', 'M', 'A'],
+        ['N', 'N', 'S', 'N', 'Q', 'T', 'S'],
+        ['R', 'M', 'G', 'S', 'U', 'P', 'H'],
+        ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
+    ];
+
+    function initPart2Grid() {
+        const grid = document.getElementById("searchGrid");
+        grid.innerHTML = "";
+        for (let r = 0; r < 7; r++) {
+            for (let c = 0; c < 7; c++) {
+                const cell = document.createElement("div");
+                cell.className = "search-cell";
+                cell.innerText = searchMatrix[r][c];
+                cell.onclick = () => cell.classList.toggle("selected");
+                grid.appendChild(cell);
+            }
+        }
+    }
+
+    function checkPart2() {
+        const keyInput = document.getElementById("secretKey").value.replace(/[^a-zA-Z]/g, "").toUpperCase();
+        const msg = document.getElementById("msg2");
+
+        if (keyInput === "CSTTNNQ") {
+            msg.className = "msg success";
+            msg.innerText = "Mật mã chính xác! Bạn đã hoàn thành trò chơi.";
+            document.getElementById("reward").classList.remove("hidden");
+        } else {
+            msg.className = "msg error";
+            msg.innerText = "Key giải mật mã chưa đúng. Hãy thử lại!";
+        }
+    }
+</script>
+</body>
+</html>
