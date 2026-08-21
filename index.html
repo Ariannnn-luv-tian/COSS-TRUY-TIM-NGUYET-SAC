@@ -105,7 +105,6 @@
             font-weight: bold;
         }
 
-        /* PART 2 STYLES */
         .search-grid {
             display: grid;
             grid-template-columns: repeat(7, 38px);
@@ -118,7 +117,7 @@
         .search-cell {
             width: 38px;
             height: 38px;
-            background-color: #2a2a2a !important;
+            background-color: #2a2a2a;
             border: 1px solid #444;
             display: flex;
             align-items: center;
@@ -156,7 +155,6 @@
 
         button:hover { background-color: #1e88e5; }
 
-        /* DÒNG GỢI Ý ĐƯỢC LÀM NỔI BẬT */
         .hint-banner {
             background-color: #2b2b11;
             border: 1px solid #887a15;
@@ -215,7 +213,6 @@
     <div id="part2" class="hidden">
         <h2>Part 2: Mật mã nguyệt sắc (5 - 7 phút)</h2>
         
-        <!-- CÂU GỢI Ý HIỂN THỊ RÕ RÀNG TẠI ĐÂY -->
         <div class="hint-banner">
             🌙 <b>Gợi ý:</b> Hãy nhìn lại những từ đã xuất hiện trong đêm trăng.
         </div>
@@ -339,15 +336,20 @@
         ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
     ];
 
-    // Tọa độ 22 ô chuẩn của 7 từ khóa
+    // TỌA ĐỘ CHUẨN XÁC 100% THEO ĐÚNG HÌNH BẠN ĐANG CLICK:
     const requiredCoords = new Set([
-        "2,6", "3,6", "4,6", "5,6",         // COSS
-        "0,0", "1,1", "2,2",                // SAC
-        "1,3", "2,3", "3,3", "4,3", "5,3", // TRANG
-        "2,1", "2,4",                       // TRAO
-        "6,1", "6,2", "6,4", "6,5", "6,6", // NGUYET
-        "4,0", "4,1", "4,2",                // NHAN
-        "4,4", "5,4"                        // QUY
+        // 1. T (1,6), C (2,6), A (3,6), S (4,6) -> TCAS/COSS dọc bên phải
+        "1,6", "2,6", "3,6", "4,6", 
+        // 2. C (2,0), T (2,1), R (2,2), A (2,3), O (2,4), R (2,5) -> CTRAOR (chứa TRAO)
+        "2,0", "2,1", "2,2", "2,3", "2,4", "2,5",
+        // 3. N (1,4), T (1,3), O (1,2) -> NGT
+        "1,4", "1,3",
+        // 4. O (3,1), N (4,1), S (4,2), N (4,3) -> ONSN (chứa NHAN)
+        "3,1", "4,1", "4,2", "4,3",
+        // 5. G (5,2), S (5,3), U (5,4) -> GSU / QUY
+        "5,2", "5,3", "4,4", "5,4",
+        // 6. N (6,1), G (6,2), U (6,3), Y (6,4), E (6,5), T (6,6) -> NGUYET
+        "6,1", "6,2", "6,3", "6,4", "6,5", "6,6"
     ]);
 
     let selectedCoords = new Set();
@@ -382,6 +384,7 @@
     function checkPart2() {
         const msg = document.getElementById("msg2");
         
+        // Kiểm tra xem tập hợp ô người chơi chọn có khớp 100% với danh sách chuẩn hay không
         let isMatch = (selectedCoords.size === requiredCoords.size);
         if (isMatch) {
             for (let key of requiredCoords) {
@@ -398,7 +401,7 @@
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Thứ tự các ô chữ đã chọn chưa chính xác. Vui lòng bấm chọn lại!";
+            msg.innerText = "Các ô chữ đã chọn chưa đúng hoặc chưa đủ 7 từ khóa. Vui lòng kiểm tra lại!";
         }
     }
 </script>
