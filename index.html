@@ -155,16 +155,6 @@
 
         button:hover { background-color: #1e88e5; }
 
-        .hint-box {
-            background: #2a2a2a;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 10px 0;
-            font-size: 13px;
-            line-height: 1.4;
-            border-left: 4px solid var(--accent-yellow);
-        }
-
         .msg { font-weight: bold; text-align: center; margin-top: 10px; font-size: 14px; }
         .msg.error { color: #ff5252; }
         .msg.success { color: #4caf50; }
@@ -211,10 +201,6 @@
     <div id="part2" class="hidden">
         <h2>Part 2: Mật mã nguyệt sắc (5 - 7 phút)</h2>
         
-        <div class="hint-box">
-            🌙 <b>Hướng dẫn:</b> Nhấp chọn trực tiếp các ô chữ trong bảng 7x7 bên dưới theo đúng thứ tự chìa khóa mật mã để giải phong ấn.
-        </div>
-
         <!-- BẢNG CHỌN 7x7 -->
         <div class="search-grid" id="searchGrid"></div>
 
@@ -222,7 +208,7 @@
         <div id="msg2" class="msg"></div>
 
         <div class="rules">
-            ⚠️ <b>Lưu ý:</b> Người chơi bấm chọn ô trên bảng để ghép chuỗi ký tự mật mã. Nhấp lại vào ô đã chọn nếu muốn bỏ chọn.
+            ⚠️ <b>Lưu ý:</b> Bấm chọn trực tiếp các ô trên bảng để ghép mật mã. Bấm lại ô đã chọn để hủy chọn.
         </div>
 
         <div id="reward" class="reward-box hidden">
@@ -350,7 +336,6 @@
                 cell.dataset.r = r;
                 cell.dataset.c = c;
                 
-                // Chọn / Bỏ chọn ô chữ trực tiếp trên bảng
                 cell.onclick = () => {
                     if (cell.classList.contains("selected")) {
                         cell.classList.remove("selected");
@@ -370,7 +355,6 @@
         const msg = document.getElementById("msg2");
         const selectedString = selectedLettersSequence.map(item => item.letter).join("");
 
-        // Kiểm tra xem chuỗi ký tự ghép từ các ô chọn có đúng mật mã không
         if (selectedString === "CSTTNNQ" || selectedString === "CSTTNQ") {
             msg.className = "msg success";
             msg.innerText = "Mật mã chính xác! Bạn đã giải phong ấn thành công Part 2.";
