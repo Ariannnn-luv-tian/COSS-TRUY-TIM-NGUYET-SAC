@@ -236,6 +236,7 @@
 </div>
 
 <script>
+    // PART 1 SETUP
     const words = [
         { num: 1, ans: "COSS",   r: 0, c: 0, dir: "H" },
         { num: 2, ans: "SAC",    r: 0, c: 2, dir: "V" },
@@ -323,6 +324,7 @@
         }
     }
 
+    // PART 2 SETUP
     const searchMatrix = [
         ['S', 'U', 'H', 'I', 'E', 'Y', 'R'],
         ['I', 'F', 'O', 'T', 'N', 'G', 'T'],
@@ -365,7 +367,7 @@
     function checkPart2() {
         const msg = document.getElementById("msg2");
 
-        // Bộ thông số chính xác [Hàng 1-7, Cột 1-7] do bạn cung cấp:
+        // Danh sách vị trí 7 từ khóa theo hệ [Hàng 1-7, Cột 1-7] do bạn cung cấp:
         const userKeywords = [
             ["3,2", "3,3", "3,4", "3,5"],              // 1. TRAO
             ["2,7", "3,6", "4,5", "5,4", "6,3"],        // 2. TRANG
@@ -376,32 +378,29 @@
             ["7,2", "7,3", "7,4", "7,5", "7,6", "7,7"]   // 7. NGUYET
         ];
 
-        // Tự động chuyển đổi từ [Hàng 1-7, Cột 1-7] sang [Hàng 0-6, Cột 0-6] trong JS
-        const targetCoords = new Set();
-        userKeywords.flat().forEach(coord => {
+        // Tự động quy đổi sang hệ tọa độ JS [Hàng 0-6, Cột 0-6]
+        const requiredWords = userKeywords.map(word => word.map(coord => {
             const [r, c] = coord.split(',').map(Number);
-            targetCoords.add(`${r - 1},${c - 1}`);
-        });
+            return `${r - 1},${c - 1}`;
+        }));
 
-        // Kiểm tra khớp chính xác 100%
-        let isMatch = (selectedCoords.size === targetCoords.size);
-
-        if (isMatch) {
-            for (let coord of selectedCoords) {
-                if (!targetCoords.has(coord)) {
-                    isMatch = false;
-                    break;
-                }
+        // Kiểm tra xem sinh viên đã bấm đủ tất cả các ô của 7 từ này chưa
+        let allWordsFound = true;
+        for (let word of requiredWords) {
+            const isWordFound = word.every(coord => selectedCoords.has(coord));
+            if (!isWordFound) {
+                allWordsFound = false;
+                break;
             }
         }
 
-        if (isMatch) {
+        if (allWordsFound) {
             msg.className = "msg success";
             msg.innerText = "Tuyệt vời! Bạn đã mở khóa thành công Part 2!";
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Chưa chính xác! Bạn kiểm tra lại các ô chữ nhé.";
+            msg.innerText = "Chưa chính xác hoặc chưa tìm đủ 7 từ khóa. Vui lòng kiểm tra lại!";
         }
     }
 </script>
