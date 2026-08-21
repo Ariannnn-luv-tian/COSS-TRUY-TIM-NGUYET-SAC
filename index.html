@@ -364,48 +364,44 @@
 
     function checkPart2() {
         const msg = document.getElementById("msg2");
-        
-        // KIỂM TRA CHUẨN TỪNG TỪ KHÓA THEO ĐÚNG HÌNH VẼ MŨI TÊN CỦA BẠN:
-        const keywords = [
-            ["2,1", "2,2", "2,3", "2,4"],             // TRAO
-            ["4,1", "3,2", "2,3", "1,4", "1,5"],       // TRANG
-            ["1,6", "2,5", "3,4", "4,3"],             // NHAN
-            ["2,0", "3,1", "4,2", "5,3"],             // COSS
-            ["4,6", "3,6", "2,6"],                     // SAC
-            ["4,4", "5,4", "6,4"],                     // QUY
-            ["6,1", "6,2", "6,3", "6,4", "6,5", "6,6"]  // NGUYET
+
+        // Bộ thông số chính xác [Hàng 1-7, Cột 1-7] do bạn cung cấp:
+        const userKeywords = [
+            ["3,2", "3,3", "3,4", "3,5"],              // 1. TRAO
+            ["2,7", "3,6", "4,5", "5,4", "6,3"],        // 2. TRANG
+            ["5,2", "4,3", "3,4", "2,5"],              // 3. NHAN
+            ["3,1", "4,2", "5,3", "6,4"],              // 4. COSS
+            ["5,7", "4,7", "3,7"],                      // 5. SAC
+            ["5,5", "6,5", "7,5"],                      // 6. QUY
+            ["7,2", "7,3", "7,4", "7,5", "7,6", "7,7"]   // 7. NGUYET
         ];
 
-        // Tất cả ô cấu thành 7 từ trên
-        const requiredAll = new Set(keywords.flat());
+        // Tự động chuyển đổi từ [Hàng 1-7, Cột 1-7] sang [Hàng 0-6, Cột 0-6] trong JS
+        const targetCoords = new Set();
+        userKeywords.flat().forEach(coord => {
+            const [r, c] = coord.split(',').map(Number);
+            targetCoords.add(`${r - 1},${c - 1}`);
+        });
 
-        // Kiểm tra xem đã bấm đủ các từ khóa chưa
-        let missing = false;
-        for (let kw of keywords) {
-            for (let coord of kw) {
-                if (!selectedCoords.has(coord)) {
-                    missing = true;
+        // Kiểm tra khớp chính xác 100%
+        let isMatch = (selectedCoords.size === targetCoords.size);
+
+        if (isMatch) {
+            for (let coord of selectedCoords) {
+                if (!targetCoords.has(coord)) {
+                    isMatch = false;
                     break;
                 }
             }
         }
 
-        // Kiểm tra xem có bấm dư ô thừa nào không
-        let extra = false;
-        for (let coord of selectedCoords) {
-            if (!requiredAll.has(coord)) {
-                extra = true;
-                break;
-            }
-        }
-
-        if (!missing && !extra) {
+        if (isMatch) {
             msg.className = "msg success";
-            msg.innerText = "Tuyệt vời! Bạn đã tìm chính xác 7 từ khóa!";
+            msg.innerText = "Tuyệt vời! Bạn đã mở khóa thành công Part 2!";
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Các ô chữ đã chọn chưa đúng hoặc chưa đủ 7 từ khóa. Vui lòng kiểm tra lại!";
+            msg.innerText = "Chưa chính xác! Bạn kiểm tra lại các ô chữ nhé.";
         }
     }
 </script>
