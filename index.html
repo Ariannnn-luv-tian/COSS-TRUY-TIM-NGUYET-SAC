@@ -333,10 +333,10 @@
         ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
     ];
 
-    // TỌA ĐỘ CHÍNH XÁC THEO ĐÚNG CÁC Ô ĐANG SÁNG TRONG ẢNH MỚI NHẤT DÙNG LỜI GIẢI MŨI TÊN:
+    // ĐÚNG CHÍNH XÁC 28 Ô BẠN ĐANG CHỌN TRONG ẢNH MỚI NHẤT
     const exactTargetCoords = [
         "1,4", "1,6",
-        "2,0", "2,1", "2,2", "2,3", "2,4", "2,6",
+        "2,0", "2,1", "2,2", "2,3", "2,4", "2,5", "2,6",
         "3,1", "3,2", "3,3", "3,4", "3,6",
         "4,1", "4,2", "4,3", "4,4", "4,6",
         "5,2", "5,3", "5,4",
@@ -387,11 +387,11 @@
 
         if (isMatch) {
             msg.className = "msg success";
-            msg.innerText = "Tuyệt vời! Bạn đã tìm đúng 7 từ khóa và mở khóa thành công Part 2.";
+            msg.innerText = "Tuyệt vời! Bạn đã mở khóa thành công Part 2!";
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Các ô chữ đã chọn chưa đúng hoặc chưa đủ 7 từ khóa. Vui lòng kiểm tra lại!";
+            msg.innerText = "Chưa chính xác! Bạn kiểm tra lại các ô chữ nhé.";
         }
     }
 </script>
