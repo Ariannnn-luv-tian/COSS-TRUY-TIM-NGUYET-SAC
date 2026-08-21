@@ -155,6 +155,16 @@
 
         button:hover { background-color: #1e88e5; }
 
+        .hint-box {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 13px;
+            line-height: 1.4;
+            border-left: 4px solid var(--accent-yellow);
+        }
+
         .msg { font-weight: bold; text-align: center; margin-top: 10px; font-size: 14px; }
         .msg.error { color: #ff5252; }
         .msg.success { color: #4caf50; }
@@ -201,6 +211,10 @@
     <div id="part2" class="hidden">
         <h2>Part 2: Mật mã nguyệt sắc (5 - 7 phút)</h2>
         
+        <div class="hint-box">
+            🌙 <b>Gợi ý:</b> Hãy nhìn lại những từ đã xuất hiện trong đêm trăng.
+        </div>
+
         <!-- BẢNG CHỌN 7x7 -->
         <div class="search-grid" id="searchGrid"></div>
 
@@ -208,13 +222,11 @@
         <div id="msg2" class="msg"></div>
 
         <div class="rules">
-            ⚠️ <b>Lưu ý:</b> Bấm chọn đủ các chữ cái thuộc 7 từ khóa trên bảng (thứ tự tùy ý). Bấm lại ô đã chọn để hủy.
+            ⚠️ <b>Lưu ý:</b> Không cho chơi lại ngay nếu sai, hoặc chỉ được xin 1 hint nhưng bị trừ điểm.
         </div>
 
         <div id="reward" class="reward-box hidden">
             🎉 <b>HOÀN THÀNH CẢ 2 VÒNG!</b><br><br>
-            🌙 <b>HOÀN THÀNH VÒNG 1:</b> Nhận 1 mảnh Nguyệt Sắc<br>
-            🌕 <b>HOÀN THÀNH VÒNG 2:</b> Nhận mảnh cuối cùng<br><br>
             ✨ <b>GHÉP 2 MẢNH:</b> Tạo thành logo/thông điệp COSS → Đổi quà đặc biệt:<br>
             • Móc khóa len<br>
             • Lồng đèn trung thu mini
@@ -321,15 +333,23 @@
         ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
     ];
 
-    // Tọa độ các ô hợp lệ cần chọn (22 ô)
-    const validCoords = new Set([
-        "2,6", "3,6", "4,6", "5,6", // COSS
-        "0,0", "1,1", "2,2",        // SAC
-        "1,3", "2,3", "3,3", "4,3", "5,3", // TRANG
-        "2,1", "2,4",               // TRAO
-        "6,1", "6,2", "6,4", "6,5", "6,6", // NGUYET
-        "4,0", "4,1", "4,2",        // NHAN
-        "4,4", "5,4"                // QUY
+    // Tập hợp tọa độ đúng của 7 từ khóa có trên ma trận Part 2
+    // 1. COSS: Cột 6 (từ r=2 đến r=5) -> "2,6", "3,6", "4,6", "5,6"
+    // 2. SAC: Đường chéo (r=0,c=0 -> r=2,c=2) -> "0,0", "1,1", "2,2"
+    // 3. TRANG: Cột 3 (r=1 đến r=5) -> "1,3", "2,3", "3,3", "4,3", "5,3"
+    // 4. TRAO: Hàng 2 (c=1 đến c=4) -> "2,1", "2,2", "2,3", "2,4"
+    // 5. NGUYET: Hàng 6 (c=1 đến c=6) -> "6,1", "6,2", "6,3", "6,4", "6,5", "6,6"
+    // 6. NHAN: Hàng 4 (c=0 đến c=3) -> "4,0", "4,1", "4,2", "4,3"
+    // 7. QUY: Tọa độ "4,4", "5,4", "6,3" (hoặc các ô chữ QUY tương ứng trên ma trận)
+    
+    const requiredCoords = new Set([
+        "2,6", "3,6", "4,6", "5,6",
+        "0,0", "1,1", "2,2",
+        "1,3", "2,3", "3,3", "4,3", "5,3",
+        "2,1", "2,4",
+        "6,1", "6,2", "6,4", "6,5", "6,6",
+        "4,0", "4,1", "4,2",
+        "4,4", "5,4"
     ]);
 
     let selectedCoords = new Set();
@@ -364,22 +384,24 @@
     function checkPart2() {
         const msg = document.getElementById("msg2");
         
-        // Đếm xem người chơi chọn đúng bao nhiêu ô thuộc các từ khóa
-        let correctCount = 0;
-        selectedCoords.forEach(key => {
-            if (validCoords.has(key)) {
-                correctCount++;
+        // So sánh chính xác tập hợp người chơi chọn với tập hợp đáp án
+        let isMatch = (selectedCoords.size === requiredCoords.size);
+        if (isMatch) {
+            for (let key of requiredCoords) {
+                if (!selectedCoords.has(key)) {
+                    isMatch = false;
+                    break;
+                }
             }
-        });
+        }
 
-        // Chỉ cần chọn được từ 20/22 ô hợp lệ trở lên là tính hoàn thành
-        if (correctCount >= 20) {
+        if (isMatch) {
             msg.className = "msg success";
-            msg.innerText = "Tuyệt vời! Bạn đã hoàn thành Part 2 và mở khóa thành công.";
+            msg.innerText = "Tuyệt vời! Bạn đã tìm chính xác 7 từ khóa và hoàn thành Part 2.";
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Chưa chọn đủ các chữ cái của 7 từ khóa. Hãy chọn thêm nhé!";
+            msg.innerText = "Các ô chữ đã chọn chưa đúng hoặc chưa đủ 7 từ khóa. Vui lòng kiểm tra lại!";
         }
     }
 </script>
