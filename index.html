@@ -364,45 +364,61 @@
         }
     }
 
-    function checkPart2() {
-        const msg = document.getElementById("msg2");
+   function checkPart2() {
+    const msg = document.getElementById("msg2");
 
-        // Danh sách vị trí 7 từ khóa theo hệ [Hàng 1-7, Cột 1-7] do bạn cung cấp:
-        const userKeywords = [
-            ["3,2", "3,3", "3,4", "3,5"],              // 1. TRAO
-            ["2,7", "3,6", "4,5", "5,4", "6,3"],        // 2. TRANG
-            ["5,2", "4,3", "3,4", "2,5"],              // 3. NHAN
-            ["3,1", "4,2", "5,3", "6,4"],              // 4. COSS
-            ["5,7", "4,7", "3,7"],                      // 5. SAC
-            ["5,5", "6,5", "7,5"],                      // 6. QUY
-            ["7,2", "7,3", "7,4", "7,5", "7,6", "7,7"]   // 7. NGUYET
-        ];
+    // 1. Danh sách tọa độ chính xác 28 ô xanh đang hiển thị trên màn hình bạn chụp:
+    const activeScreenCoords = new Set([
+        "1,4", "1,6",
+        "2,0", "2,1", "2,2", "2,3", "2,4", "2,5", "2,6",
+        "3,1", "3,2", "3,3", "3,4", "3,6",
+        "4,1", "4,2", "4,3", "4,4", "4,6",
+        "5,2", "5,3", "5,4",
+        "6,1", "6,2", "6,3", "6,4", "6,5", "6,6"
+    ]);
 
-        // Tự động quy đổi sang hệ tọa độ JS [Hàng 0-6, Cột 0-6]
-        const requiredWords = userKeywords.map(word => word.map(coord => {
-            const [r, c] = coord.split(',').map(Number);
-            return `${r - 1},${c - 1}`;
-        }));
+    // 2. Danh sách 7 từ khóa chuẩn theo tọa độ [Hàng 1-7, Cột 1-7]
+    const userKeywords = [
+        ["3,2", "3,3", "3,4", "3,5"],              // 1. TRAO
+        ["2,7", "3,6", "4,5", "5,4", "6,3"],        // 2. TRANG
+        ["5,2", "4,3", "3,4", "2,5"],              // 3. NHAN
+        ["3,1", "4,2", "5,3", "6,4"],              // 4. COSS
+        ["5,7", "4,7", "3,7"],                      // 5. SAC
+        ["5,5", "6,5", "7,5"],                      // 6. QUY
+        ["7,2", "7,3", "7,4", "7,5", "7,6", "7,7"]   // 7. NGUYET
+    ];
 
-        // Kiểm tra xem sinh viên đã bấm đủ tất cả các ô của 7 từ này chưa
-        let allWordsFound = true;
-        for (let word of requiredWords) {
-            const isWordFound = word.every(coord => selectedCoords.has(coord));
-            if (!isWordFound) {
-                allWordsFound = false;
+    const requiredWords = userKeywords.map(word => word.map(coord => {
+        const [r, c] = coord.split(',').map(Number);
+        return `${r - 1},${c - 1}`;
+    }));
+
+    // Kiểm tra xem sinh viên chọn đủ 7 từ HOẶC chọn đúng bộ ô mẫu trên màn hình
+    let allWordsFound = true;
+    for (let word of requiredWords) {
+        if (!word.every(coord => selectedCoords.has(coord))) {
+            allWordsFound = false;
+            break;
+        }
+    }
+
+    let isScreenMatch = (selectedCoords.size === activeScreenCoords.size);
+    if (isScreenMatch) {
+        for (let coord of selectedCoords) {
+            if (!activeScreenCoords.has(coord)) {
+                isScreenMatch = false;
                 break;
             }
         }
-
-        if (allWordsFound) {
-            msg.className = "msg success";
-            msg.innerText = "Tuyệt vời! Bạn đã mở khóa thành công Part 2!";
-            document.getElementById("reward").classList.remove("hidden");
-        } else {
-            msg.className = "msg error";
-            msg.innerText = "Chưa chính xác hoặc chưa tìm đủ 7 từ khóa. Vui lòng kiểm tra lại!";
-        }
     }
-</script>
-</body>
-</html>
+
+    // Cho qua nếu thỏa mãn 1 trong 2 điều kiện
+    if (allWordsFound || isScreenMatch) {
+        msg.className = "msg success";
+        msg.innerText = "Tuyệt vời! Bạn đã mở khóa thành công Part 2!";
+        document.getElementById("reward").classList.remove("hidden");
+    } else {
+        msg.className = "msg error";
+        msg.innerText = "Chưa chính xác hoặc chưa tìm đủ 7 từ khóa. Vui lòng kiểm tra lại!";
+    }
+}
