@@ -1,210 +1,250 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Truy Tìm Nguyệt Sắc - COSS</title>
-<style>
-:root{
-  --bg:#0d1020; --card:#171b31; --card2:#202642; --gold:#ffd66b;
-  --moon:#fff4c2; --text:#f8f8ff; --muted:#b9bfd8; --ok:#72e6a0; --bad:#ff7d8d;
-}
-*{box-sizing:border-box}
-body{
-  margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text);
-  background:radial-gradient(circle at 50% 0%,#28345e 0,#0d1020 48%,#080a13 100%);
-  min-height:100vh;
-}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;
- background-image:radial-gradient(#fff 1px,transparent 1px);background-size:42px 42px;}
-.container{width:min(1000px,94%);margin:auto;padding:28px 0 50px;position:relative}
-.hero{text-align:center;padding:25px 10px 20px}
-.moon{font-size:62px;filter:drop-shadow(0 0 20px #ffe48a)}
-h1{margin:6px 0;color:var(--gold);font-size:clamp(30px,6vw,54px)}
-h2{margin:8px 0 18px;font-size:28px}
-.subtitle{color:var(--muted);font-size:16px;line-height:1.6}
-.card{background:rgba(23,27,49,.94);border:1px solid #394264;border-radius:20px;padding:22px;margin:18px 0;box-shadow:0 12px 35px #0005}
-.hidden{display:none!important}
-button{border:0;border-radius:12px;padding:12px 18px;font-size:16px;font-weight:700;cursor:pointer}
-.primary{background:var(--gold);color:#17120a}
-.secondary{background:#313957;color:white}
-button:disabled{opacity:.45;cursor:not-allowed}
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0}
-.rule{background:#202642;padding:14px;border-radius:14px;text-align:center}
-.timer{font-size:25px;font-weight:800;color:var(--gold);text-align:center;margin:10px}
-.progress{text-align:center;color:var(--muted);margin:8px}
-.question-list{display:grid;gap:10px;margin-top:15px}
-.question{background:#202642;border-radius:14px;padding:13px}
-.question b{color:var(--gold)}
-.answerRow{display:flex;gap:8px;margin-top:9px}
-.answerRow input{flex:1;min-width:0;background:#0d1020;color:white;border:1px solid #4b557c;border-radius:9px;padding:10px;font-size:16px}
-.feedback{font-size:14px;margin-top:7px;min-height:18px}
-.ok{color:var(--ok)} .bad{color:var(--bad)}
-.crosswordWrap{overflow:auto;padding:10px 0}
-.grid{display:grid;grid-template-columns:repeat(11,34px);grid-auto-rows:34px;justify-content:center;gap:3px}
-.cell{width:34px;height:34px;border-radius:6px;background:#2b3355;display:flex;align-items:center;justify-content:center;font-weight:800;color:white;position:relative}
-.cell.block{background:transparent}
-.cell.active{background:#4c5780}
-.cell.revealed{background:#8c6d22;color:#fff6c8}
-.cell.secret{box-shadow:inset 0 0 0 3px var(--gold)}
-.cell input{width:100%;height:100%;border:0;background:transparent;color:white;text-align:center;font-size:19px;font-weight:800;outline:none;text-transform:uppercase}
-.clues{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:700px){.clues{grid-template-columns:1fr}.grid{grid-template-columns:repeat(11,29px);grid-auto-rows:29px}.cell{width:29px;height:29px}.cell input{font-size:16px}}
-.clue{background:#202642;padding:14px;border-radius:13px;line-height:1.45}
-.clue span{color:var(--gold);font-weight:800}
-.secretBox{background:linear-gradient(135deg,#352d18,#202642);border:1px solid #79622c;border-radius:15px;padding:16px;margin-top:16px;text-align:center}
-.secretWord{font-size:26px;letter-spacing:5px;color:var(--gold);font-weight:900;min-height:35px}
-.memoryGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:600px;margin:18px auto}
-.memoryCard{height:95px;background:#313957;border:2px solid #485377;border-radius:14px;color:transparent;font-size:24px;display:flex;align-items:center;justify-content:center}
-.memoryCard.show{color:var(--gold);background:#252c49}
-.memoryCard.selected{border-color:var(--gold);box-shadow:0 0 15px #ffd66b55}
-.codeArea{max-width:650px;margin:20px auto}
-.codeLine{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.codeBox{width:48px;height:52px;border:2px solid #4b557c;border-radius:10px;background:#0d1020;color:white;text-align:center;font-size:22px;font-weight:800;text-transform:uppercase}
-.result{text-align:center;padding:25px;border:1px solid #66552b;background:#211d13;border-radius:18px}
-.big{font-size:36px;color:var(--gold);font-weight:900}
-.note{color:var(--muted);font-size:14px;line-height:1.5}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truy Tìm Nguyệt Sắc - COSS</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --accent-green: #28a745;
+            --text-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        h2, h3 { text-align: center; color: #ffeb3b; margin-top: 0; }
+        .hidden { display: none !important; }
+
+        /* Grid CSS */
+        .crossword-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 35px);
+            grid-template-rows: repeat(7, 35px);
+            gap: 4px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .cell {
+            width: 35px;
+            height: 35px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .cell.active { background-color: #000; border-color: #666; }
+        .cell.correct { background-color: var(--accent-green); border-color: #5cdb5c; }
+        
+        .cell input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            text-align: center;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .cell .num {
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            font-size: 9px;
+            color: #aaa;
+            pointer-events: none;
+        }
+
+        .clues { margin-top: 15px; font-size: 14px; line-height: 1.5; }
+        .clues h4 { margin: 8px 0 4px 0; color: #00bcd4; }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover { background-color: #1e88e5; }
+        .hint-box { background: #333; padding: 10px; border-radius: 6px; margin: 10px 0; font-size: 13px; }
+        .success-msg { color: #4caf50; font-weight: bold; text-align: center; margin-top: 10px; }
+    </style>
 </head>
 <body>
+
 <div class="container">
+    <!-- PART 1 -->
+    <div id="part1">
+        <h2>Part 1: Ô Chữ Bí Mật</h2>
+        <div class="crossword-grid" id="grid"></div>
+        <button onclick="checkPart1()">Kiểm Tra Đáp Án</button>
+        <div id="msg1" class="success-msg"></div>
 
-<section id="home" class="hero">
-  <div class="moon">🌕</div>
-  <h1>TRUY TÌM NGUYỆT SẮC</h1>
-  <div class="subtitle">COSS × Dự án Trung Thu <b>“Nguyệt Sắc Trao Nhân”</b></div>
-  <div class="card">
-    <h2>Hai vòng – một hành trình</h2>
-    <div class="rules">
-      <div class="rule">🔎<br><b>Vòng 1</b><br>Ô Chữ Bí Mật</div>
-      <div class="rule">🔐<br><b>Vòng 2</b><br>Mật Mã Nguyệt Sắc</div>
-      <div class="rule">🎁<br><b>Hoàn thành 2 vòng</b><br>Nhận quà đặc biệt</div>
-    </div>
-    <p class="subtitle">Hãy giải các manh mối về COSS, Trung Thu và tinh thần trao yêu thương. Vòng 2 sẽ dùng thông tin bạn tìm được ở vòng 1.</p>
-    <button class="primary" onclick="startGame()">BẮT ĐẦU</button>
-  </div>
-</section>
+        <div class="clues">
+            <h4>Hàng ngang</h4>
+            1. CLB của mình thường được gọi tắt bằng 4 chữ cái nào? (4 chữ)<br>
+            3. Vào đêm rằm tháng 8 âm lịch, thứ gì trên bầu trời tròn và sáng nhất trong năm? (5 chữ)<br>
+            5. Điều ngược lại với hành động "nhận" gọi là gì? (4 chữ)<br>
+            7. Từ Hán Việt nào dùng để chỉ ánh trăng, cũng là chữ mở đầu tên dự án Trung Thu năm nay? (6 chữ)
 
-<section id="round1" class="hidden">
-  <div class="card">
-    <h2>🔎 VÒNG 1 — Ô CHỮ BÍ MẬT</h2>
-    <div class="timer">⏱ <span id="timer1">04:00</span></div>
-    <p class="note">Điền đáp án vào các ô. Không phân biệt chữ hoa/thường và bỏ dấu. Hoàn thành tất cả câu để mở khóa vòng 2.</p>
-
-    <div class="clues">
-      <div class="clue"><span>1.</span> CLB của mình thường được gọi tắt bằng 4 chữ cái nào? <b>(4 chữ)</b></div>
-      <div class="clue"><span>3.</span> Vào đêm rằm tháng 8 âm lịch, thứ gì trên bầu trời tròn và sáng nhất trong năm? <b>(5 chữ)</b></div>
-      <div class="clue"><span>5.</span> Điều ngược lại với hành động “nhận” gọi là gì? <b>(4 chữ)</b></div>
-      <div class="clue"><span>7.</span> Từ Hán Việt nào dùng để chỉ ánh trăng, cũng là chữ mở đầu tên dự án Trung Thu năm nay? <b>(6 chữ)</b></div>
-      <div class="clue"><span>2.</span> Cầu vồng được tạo nên từ nhiều gì hợp lại? <b>(3 chữ)</b></div>
-      <div class="clue"><span>4.</span> Trong tiếng Hán Việt, từ nào mang nghĩa là “con người”? <b>(4 chữ)</b></div>
-      <div class="clue"><span>6.</span> Số tiền được để dành riêng cho một mục đích cụ thể, ví dụ để tổ chức một chương trình, được gọi là gì? <b>(3 chữ)</b></div>
+            <h4>Hàng dọc</h4>
+            2. Cầu vồng được tạo nên từ nhiều gì hợp lại? (3 chữ)<br>
+            4. Trong tiếng Hán Việt, từ nào mang nghĩa là "con người"? (4 chữ)<br>
+            6. Số tiền được để dành riêng cho một mục đích cụ thể, ví dụ để tổ chức một chương trình, được gọi là gì? (3 chữ)
+        </div>
     </div>
 
-    <div class="question-list">
-      <div class="question"><b>1.</b> Đáp án <div class="answerRow"><input id="a1" maxlength="4"><button class="secondary" onclick="check('a1','COSS',this)">Kiểm tra</button></div><div id="f1" class="feedback"></div></div>
-      <div class="question"><b>2.</b> Đáp án <div class="answerRow"><input id="a2" maxlength="3"><button class="secondary" onclick="check('a2','MAU',this)">Kiểm tra</button></div><div id="f2" class="feedback"></div></div>
-      <div class="question"><b>3.</b> Đáp án <div class="answerRow"><input id="a3" maxlength="5"><button class="secondary" onclick="check('a3','TRANG',this)">Kiểm tra</button></div><div id="f3" class="feedback"></div></div>
-      <div class="question"><b>4.</b> Đáp án <div class="answerRow"><input id="a4" maxlength="4"><button class="secondary" onclick="check('a4','NHAN',this)">Kiểm tra</button></div><div id="f4" class="feedback"></div></div>
-      <div class="question"><b>5.</b> Đáp án <div class="answerRow"><input id="a5" maxlength="4"><button class="secondary" onclick="check('a5','TRAO',this)">Kiểm tra</button></div><div id="f5" class="feedback"></div></div>
-      <div class="question"><b>6.</b> Đáp án <div class="answerRow"><input id="a6" maxlength="3"><button class="secondary" onclick="check('a6','QUY',this)">Kiểm tra</button></div><div id="f6" class="feedback"></div></div>
-      <div class="question"><b>7.</b> Đáp án <div class="answerRow"><input id="a7" maxlength="6"><button class="secondary" onclick="check('a7','NGUYET',this)">Kiểm tra</button></div><div id="f7" class="feedback"></div></div>
+    <!-- PART 2 -->
+    <div id="part2" class="hidden">
+        <h2>Part 2: Mật Mã Nguyệt Sắc</h2>
+        <div class="hint-box">
+            🌙 <i>"Không phải tất cả những gì bạn tìm được ở vòng 1 đều là đáp án. Có những thứ là chìa khóa."</i><br><br>
+            <b>Gợi ý:</b> Lấy chữ cái đầu của các từ xuất hiện trong đêm trăng thuộc về COSS ở Part 1 ghép lại làm Key giải mật mã!
+        </div>
+
+        <div style="text-align: center; margin: 15px 0;">
+            <input type="text" id="secretKey" placeholder="Nhập Key (Ví dụ: C-S-...)" style="width: 80%; padding: 10px; font-size: 16px; text-transform: uppercase;">
+        </div>
+
+        <button onclick="checkPart2()">Mở Khóa Mật Mã</button>
+        <div id="msg2" class="success-msg"></div>
+
+        <div id="reward" class="hidden" style="text-align: center; margin-top: 20px;">
+            🎉 <b>CHÚC MỪNG BẠN ĐÃ HOÀN THÀNH!</b><br>
+            Hãy đưa màn hình này cho BTC để đổi phần quà:<br>
+            ✨ <b>Móc khóa len / Lồng đèn trung thu mini</b>
+        </div>
     </div>
-
-    <div class="secretBox">
-      <div class="note">TỪ KHÓA VÒNG 1</div>
-      <div id="secret1" class="secretWord">_ _ _ _ _ _</div>
-      <div id="round1Status" class="note">Hoàn thành 7/7 câu để tiếp tục.</div>
-    </div>
-    <button id="toRound2" class="primary hidden" onclick="startRound2()">🔐 MỞ KHÓA VÒNG 2</button>
-  </div>
-</section>
-
-<section id="round2" class="hidden">
-  <div class="card">
-    <h2>🔐 VÒNG 2 — MẬT MÃ NGUYỆT SẮC</h2>
-    <div class="timer">⏱ <span id="timer2">07:00</span></div>
-    <p class="note">Bạn đã tìm được những mảnh ghép ở vòng 1. Hãy ghi nhớ bảng ký hiệu dưới đây. Bạn có <b>20 giây</b> để quan sát.</p>
-
-    <div id="memoryIntro" class="result">
-      <div class="big">20</div>
-      <p>Giây ghi nhớ</p>
-    </div>
-
-    <div id="memoryGrid" class="memoryGrid hidden">
-      <div class="memoryCard">🌙</div><div class="memoryCard">❤️</div><div class="memoryCard">🎁</div><div class="memoryCard">⭐</div>
-      <div class="memoryCard">🥮</div><div class="memoryCard">🤝</div><div class="memoryCard">🌙</div><div class="memoryCard">❤️</div>
-      <div class="memoryCard">⭐</div><div class="memoryCard">🎁</div><div class="memoryCard">🤝</div><div class="memoryCard">🥮</div>
-    </div>
-
-    <div id="memoryQuestion" class="hidden">
-      <p><b>Nhiệm vụ 1:</b> Hãy nhập 4 ký hiệu xuất hiện ở hàng đầu tiên, theo đúng thứ tự.</p>
-      <div class="codeLine">
-        <input class="codeBox" maxlength="2"><input class="codeBox" maxlength="2"><input class="codeBox" maxlength="2"><input class="codeBox" maxlength="2">
-      </div>
-      <button class="primary" onclick="checkMemory()">Kiểm tra</button>
-      <div id="memoryFeedback" class="feedback"></div>
-    </div>
-
-    <div id="codeStep" class="hidden">
-      <hr style="border-color:#394264;margin:25px 0">
-      <p><b>Nhiệm vụ 2:</b> Dùng từ khóa ở vòng 1 để giải câu mật mã.</p>
-      <p class="note">Gợi ý: <b>COSS – TRĂNG – TRAO – NGUYỆT – NHÂN – QUỸ</b>. Hãy lấy <b>chữ cái đầu</b> của 6 từ này.</p>
-      <div class="codeLine">
-        <input class="codeBox" maxlength="1"><input class="codeBox" maxlength="1"><input class="codeBox" maxlength="1"><input class="codeBox" maxlength="1"><input class="codeBox" maxlength="1"><input class="codeBox" maxlength="1">
-      </div>
-      <p class="note">Mật mã cần tìm: <b>C T T N N Q</b></p>
-      <button class="primary" onclick="finishRound2()">GIẢI MẬT MÃ</button>
-      <div id="codeFeedback" class="feedback"></div>
-    </div>
-  </div>
-</section>
-
-<section id="finish" class="hidden">
-  <div class="card result">
-    <div class="moon">🌕</div>
-    <h2>CHÚC MỪNG!</h2>
-    <div class="big">BẠN ĐÃ GIẢI MẬT NGUYỆT SẮC</div>
-    <p>🎁 Hãy đưa màn hình này cho BTC để nhận <b>quà đặc biệt</b>.</p>
-    <p class="note">Cảm ơn bạn đã dành thời gian tìm hiểu COSS và đồng hành cùng tinh thần <b>“Nguyệt Sắc Trao Nhân”</b>.</p>
-  </div>
-</section>
-
 </div>
+
 <script>
-let solved=0, t1=240, t2=420, timer1, timer2;
-const answers={a1:'COSS',a2:'MAU',a3:'TRANG',a4:'NHAN',a5:'TRAO',a6:'QUY',a7:'NGUYET'};
-function norm(s){return s.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toUpperCase().trim();}
-function startGame(){document.getElementById('home').classList.add('hidden');document.getElementById('round1').classList.remove('hidden');startTimer1();}
-function startTimer1(){timer1=setInterval(()=>{t1--;showTime('timer1',t1);if(t1<=0){clearInterval(timer1);alert('Hết giờ vòng 1!');}},1000);}
-function showTime(id,t){let m=Math.floor(t/60),s=t%60;document.getElementById(id).textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
-function check(id,ans,btn){
- if(btn.disabled)return;
- const val=norm(document.getElementById(id).value), f=document.getElementById(id.replace('a','f'));
- if(val===ans){btn.disabled=true;document.getElementById(id).disabled=true;f.textContent='✓ Chính xác!';f.className='feedback ok';solved++;document.getElementById('round1Status').textContent='Hoàn thành '+solved+'/7 câu.';
- if(solved===7){clearInterval(timer1);document.getElementById('secret1').textContent='NGUYET';document.getElementById('toRound2').classList.remove('hidden');document.getElementById('round1Status').textContent='🌕 Đã hoàn thành vòng 1! Từ khóa là NGUYET.';}
- }else{f.textContent='Chưa đúng, thử lại nhé!';f.className='feedback bad';}
-}
-function startRound2(){
- document.getElementById('round1').classList.add('hidden');document.getElementById('round2').classList.remove('hidden');
- let n=20;document.getElementById('memoryIntro').querySelector('.big').textContent=n;
- document.getElementById('memoryGrid').classList.remove('hidden');
- let c=setInterval(()=>{n--;document.getElementById('memoryIntro').querySelector('.big').textContent=n;if(n<=0){clearInterval(c);document.getElementById('memoryGrid').classList.add('hidden');document.getElementById('memoryIntro').classList.add('hidden');document.getElementById('memoryQuestion').classList.remove('hidden');}},1000);
- startTimer2();
-}
-function startTimer2(){timer2=420;timer2=setInterval(()=>{timer2--;showTime('timer2',timer2);if(timer2<=0){clearInterval(timer2);alert('Hết giờ vòng 2!');}},1000);}
-function checkMemory(){
- const boxes=[...document.querySelectorAll('#memoryQuestion .codeBox')], val=boxes.map(x=>norm(x.value)).join('');
- const f=document.getElementById('memoryFeedback');
- if(val==='🌙❤️🎁⭐'){f.textContent='✓ Chính xác! Mở nhiệm vụ cuối.';f.className='feedback ok';document.getElementById('codeStep').classList.remove('hidden');}
- else{f.textContent='Chưa đúng. Hãy nhớ 4 ký hiệu ở hàng đầu tiên.';f.className='feedback bad';}
-}
-function finishRound2(){
- const boxes=[...document.querySelectorAll('#codeStep .codeBox')], val=boxes.map(x=>norm(x.value)).join('');
- const f=document.getElementById('codeFeedback');
- if(val==='CTTNNQ'){clearInterval(timer2);document.getElementById('round2').classList.add('hidden');document.getElementById('finish').classList.remove('hidden');}
- else{f.textContent='Mật mã chưa đúng. Gợi ý: lấy chữ cái đầu của COSS – TRĂNG – TRAO – NGUYỆT – NHÂN – QUỸ.';f.className='feedback bad';}
-}
+    // Định vị sơ đồ ô chữ Part 1 (Row, Col, Number, Answer)
+    const layout = [
+        // Horizontal
+        { r: 0, c: 0, num: 1, ans: "COSS", dir: "H" },
+        { r: 2, c: 0, num: 3, ans: "TRANG", dir: "H" },
+        { r: 4, c: 2, num: 5, ans: "TRAO", dir: "H" },
+        { r: 5, c: 3, num: 7, ans: "NGUYET", dir: "H" },
+        // Vertical
+        { r: 0, c: 3, num: 2, ans: "SAC", dir: "V" },
+        { r: 2, c: 3, num: 4, ans: "NHAN", dir: "V" },
+        { r: 4, c: 5, num: 6, ans: "QUY", dir: "V" }
+    ];
+
+    const gridEl = document.getElementById("grid");
+    const matrix = Array(7).fill(null).map(() => Array(7).fill(null));
+
+    // Khởi tạo lưới 7x7
+    function initGrid() {
+        // Đánh dấu ô hoạt động
+        layout.forEach(item => {
+            for (let i = 0; i < item.ans.length; i++) {
+                let r = item.dir === "H" ? item.r : item.r + i;
+                let c = item.dir === "H" ? item.c + i : item.c;
+                if (!matrix[r][c]) {
+                    matrix[r][c] = { letter: item.ans[i], num: (i === 0 ? item.num : null) };
+                }
+            }
+        });
+
+        // Tạo phần tử HTML
+        for (let r = 0; r < 7; r++) {
+            for (let c = 0; c < 7; c++) {
+                const cell = document.createElement("div");
+                cell.className = "cell";
+                if (matrix[r][c]) {
+                    cell.classList.add("active");
+                    if (matrix[r][c].num) {
+                        cell.innerHTML += `<span class="num">${matrix[r][c].num}</span>`;
+                    }
+                    const input = document.createElement("input");
+                    input.maxLength = 1;
+                    input.dataset.r = r;
+                    input.dataset.c = c;
+                    cell.appendChild(input);
+                }
+                gridEl.appendChild(cell);
+            }
+        }
+    }
+
+    function checkPart1() {
+        let isCorrect = true;
+        const inputs = gridEl.querySelectorAll("input");
+
+        inputs.forEach(input => {
+            let r = input.dataset.r;
+            let c = input.dataset.c;
+            if (input.value.toUpperCase() === matrix[r][c].letter) {
+                input.parentElement.classList.add("correct");
+            } else {
+                input.parentElement.classList.remove("correct");
+                isCorrect = false;
+            }
+        });
+
+        if (isCorrect) {
+            document.getElementById("msg1").style.color = "#4caf50";
+            document.getElementById("msg1").innerText = "Chính xác! Đang chuyển sang Part 2...";
+            setTimeout(() => {
+                document.getElementById("part1").classList.add("hidden");
+                document.getElementById("part2").classList.remove("hidden");
+            }, 1500);
+        } else {
+            document.getElementById("msg1").style.color = "red";
+            document.getElementById("msg1").innerText = "Có ô chưa đúng, bạn hãy kiểm tra lại nhé!";
+        }
+    }
+
+    function checkPart2() {
+        const keyInput = document.getElementById("secretKey").value.replace(/[^a-zA-Z]/g, "").toUpperCase();
+        // Key đúng: C-S-T-T-N-N-Q (COSS - SẮC - TRĂNG - TRAO - NGUYỆT - NHÂN - QUỸ)
+        const correctKey = "CSTTNNQ";
+
+        if (keyInput === correctKey) {
+            document.getElementById("msg2").style.color = "#4caf50";
+            document.getElementById("msg2").innerText = "Mật mã chính xác!";
+            document.getElementById("reward").classList.remove("hidden");
+        } else {
+            document.getElementById("msg2").style.color = "red";
+            document.getElementById("msg2").innerText = "Key mật mã chưa đúng. Hãy thử lại!";
+        }
+    }
+
+    initGrid();
 </script>
 </body>
 </html>
