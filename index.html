@@ -105,6 +105,7 @@
             font-weight: bold;
         }
 
+        /* PART 2 STYLES */
         .search-grid {
             display: grid;
             grid-template-columns: repeat(7, 38px);
@@ -117,7 +118,7 @@
         .search-cell {
             width: 38px;
             height: 38px;
-            background-color: #2a2a2a;
+            background-color: #2a2a2a !important;
             border: 1px solid #444;
             display: flex;
             align-items: center;
@@ -132,9 +133,9 @@
         }
 
         .search-cell.selected { 
-            background-color: #00bcd4; 
-            color: #000;
-            border-color: #00e5ff;
+            background-color: #00bcd4 !important; 
+            color: #000 !important;
+            border-color: #00e5ff !important;
         }
 
         .clues { font-size: 13px; line-height: 1.5; margin-top: 15px; }
@@ -155,21 +156,24 @@
 
         button:hover { background-color: #1e88e5; }
 
-        .hint-box {
-            background: #2a2a2a;
-            padding: 12px;
+        /* DÒNG GỢI Ý ĐƯỢC LÀM NỔI BẬT */
+        .hint-banner {
+            background-color: #2b2b11;
+            border: 1px solid #887a15;
+            color: #fff176;
+            padding: 10px;
             border-radius: 6px;
-            margin: 10px 0;
-            font-size: 13px;
-            line-height: 1.4;
-            border-left: 4px solid var(--accent-yellow);
+            text-align: center;
+            font-size: 14px;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .msg { font-weight: bold; text-align: center; margin-top: 10px; font-size: 14px; }
         .msg.error { color: #ff5252; }
         .msg.success { color: #4caf50; }
 
-        .rules { font-size: 12px; color: #ff8a80; margin-top: 10px; font-style: italic; }
+        .rules { font-size: 12px; color: #ff8a80; margin-top: 10px; font-style: italic; text-align: center; }
 
         .reward-box {
             background: #253b29;
@@ -211,7 +215,8 @@
     <div id="part2" class="hidden">
         <h2>Part 2: Mật mã nguyệt sắc (5 - 7 phút)</h2>
         
-        <div class="hint-box">
+        <!-- CÂU GỢI Ý HIỂN THỊ RÕ RÀNG TẠI ĐÂY -->
+        <div class="hint-banner">
             🌙 <b>Gợi ý:</b> Hãy nhìn lại những từ đã xuất hiện trong đêm trăng.
         </div>
 
@@ -225,6 +230,7 @@
             ⚠️ <b>Lưu ý:</b> Không cho chơi lại ngay nếu sai, hoặc chỉ được xin 1 hint nhưng bị trừ điểm.
         </div>
 
+        <!-- PHẦN THƯỞNG -->
         <div id="reward" class="reward-box hidden">
             🎉 <b>HOÀN THÀNH CẢ 2 VÒNG!</b><br><br>
             ✨ <b>GHÉP 2 MẢNH:</b> Tạo thành logo/thông điệp COSS → Đổi quà đặc biệt:<br>
@@ -315,14 +321,14 @@
                 document.getElementById("part1").classList.add("hidden");
                 document.getElementById("part2").classList.remove("hidden");
                 initPart2Grid();
-            }, 1200);
+            }, 1000);
         } else {
             msg.className = "msg error";
             msg.innerText = "Có ô chưa chính xác, bạn hãy kiểm tra lại nhé!";
         }
     }
 
-    // Ma trận 7x7 Part 2
+    // Ma trận Part 2
     const searchMatrix = [
         ['S', 'U', 'H', 'I', 'E', 'Y', 'R'],
         ['I', 'F', 'O', 'T', 'N', 'G', 'T'],
@@ -333,23 +339,15 @@
         ['I', 'N', 'G', 'U', 'Y', 'E', 'T']
     ];
 
-    // Tập hợp tọa độ đúng của 7 từ khóa có trên ma trận Part 2
-    // 1. COSS: Cột 6 (từ r=2 đến r=5) -> "2,6", "3,6", "4,6", "5,6"
-    // 2. SAC: Đường chéo (r=0,c=0 -> r=2,c=2) -> "0,0", "1,1", "2,2"
-    // 3. TRANG: Cột 3 (r=1 đến r=5) -> "1,3", "2,3", "3,3", "4,3", "5,3"
-    // 4. TRAO: Hàng 2 (c=1 đến c=4) -> "2,1", "2,2", "2,3", "2,4"
-    // 5. NGUYET: Hàng 6 (c=1 đến c=6) -> "6,1", "6,2", "6,3", "6,4", "6,5", "6,6"
-    // 6. NHAN: Hàng 4 (c=0 đến c=3) -> "4,0", "4,1", "4,2", "4,3"
-    // 7. QUY: Tọa độ "4,4", "5,4", "6,3" (hoặc các ô chữ QUY tương ứng trên ma trận)
-    
+    // Tọa độ 22 ô chuẩn của 7 từ khóa
     const requiredCoords = new Set([
-        "2,6", "3,6", "4,6", "5,6",
-        "0,0", "1,1", "2,2",
-        "1,3", "2,3", "3,3", "4,3", "5,3",
-        "2,1", "2,4",
-        "6,1", "6,2", "6,4", "6,5", "6,6",
-        "4,0", "4,1", "4,2",
-        "4,4", "5,4"
+        "2,6", "3,6", "4,6", "5,6",         // COSS
+        "0,0", "1,1", "2,2",                // SAC
+        "1,3", "2,3", "3,3", "4,3", "5,3", // TRANG
+        "2,1", "2,4",                       // TRAO
+        "6,1", "6,2", "6,4", "6,5", "6,6", // NGUYET
+        "4,0", "4,1", "4,2",                // NHAN
+        "4,4", "5,4"                        // QUY
     ]);
 
     let selectedCoords = new Set();
@@ -384,7 +382,6 @@
     function checkPart2() {
         const msg = document.getElementById("msg2");
         
-        // So sánh chính xác tập hợp người chơi chọn với tập hợp đáp án
         let isMatch = (selectedCoords.size === requiredCoords.size);
         if (isMatch) {
             for (let key of requiredCoords) {
@@ -397,11 +394,11 @@
 
         if (isMatch) {
             msg.className = "msg success";
-            msg.innerText = "Tuyệt vời! Bạn đã tìm chính xác 7 từ khóa và hoàn thành Part 2.";
+            msg.innerText = "Tuyệt vời! Bạn đã tìm đúng 7 từ khóa và mở khóa thành công Part 2.";
             document.getElementById("reward").classList.remove("hidden");
         } else {
             msg.className = "msg error";
-            msg.innerText = "Các ô chữ đã chọn chưa đúng hoặc chưa đủ 7 từ khóa. Vui lòng kiểm tra lại!";
+            msg.innerText = "Thứ tự các ô chữ đã chọn chưa chính xác. Vui lòng bấm chọn lại!";
         }
     }
 </script>
